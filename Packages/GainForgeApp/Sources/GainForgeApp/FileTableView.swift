@@ -1,9 +1,10 @@
 import SwiftUI
 import AppKit
+import PhotoKitShared
 
 /// 中央のファイル一覧テーブル（ドロップ受付兼用）。空のときは Empty state。
 struct FileTableView: View {
-    @EnvironmentObject var model: AppViewModel
+    @EnvironmentObject var model: GainForgeViewModel
     @Environment(\.openWindow) private var openWindow
     @State private var isTargeted = false
 
@@ -48,7 +49,7 @@ struct FileTableView: View {
             .width(min: 140, ideal: 220)
 
             TableColumn("ゲインマップ") { item in
-                cell { item.gainMap.chip }
+                cell { item.extra.gainMap.chip }
             }
             .width(90)
 
@@ -60,7 +61,7 @@ struct FileTableView: View {
                             Image(systemName: "info.circle").foregroundStyle(.secondary).help(msg)
                         }
                         // 出力 HEIC を持つ行（完了 / 既存）：比較ビューワを開く / 内容を差し替える。
-                        if item.hasComparableOutput {
+                        if hasComparableOutput(item) {
                             Button { openViewer(item) } label: {
                                 Image(systemName: "rectangle.split.2x1")
                             }
@@ -137,7 +138,7 @@ struct FileTableView: View {
         }
         // 出力 HEIC を持つ行（完了 / 既存）を単一選択しているときは比較ビューワも開ける。
         if ids.count == 1, let item = model.items.first(where: { ids.contains($0.id) }),
-           item.hasComparableOutput {
+           hasComparableOutput(item) {
             Button("比較ビューワで表示") { openViewer(item) }
         }
     }

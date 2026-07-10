@@ -10,6 +10,7 @@ extension RowStatus {
         case .done:       Chip("完了", systemImage: "checkmark", color: .green, filled: true)
         case .error:      Chip("エラー", systemImage: "exclamationmark.triangle", color: .red, filled: true)
         case .skipped:    Chip("スキップ", color: .secondary)
+        case .existing:   Chip("既存", color: .secondary)   // JpegResizer では遷移させないが、共通 enum のため網羅する。
         }
     }
 }

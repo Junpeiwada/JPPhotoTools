@@ -1,8 +1,9 @@
 import SwiftUI
+import PhotoKitShared
 
 /// 下部ステータスバー：進捗、件数、合計サイズ・削減率。
 struct StatusBarView: View {
-    @EnvironmentObject var model: AppViewModel
+    @EnvironmentObject var model: GainForgeViewModel
 
     var body: some View {
         HStack(spacing: 12) {

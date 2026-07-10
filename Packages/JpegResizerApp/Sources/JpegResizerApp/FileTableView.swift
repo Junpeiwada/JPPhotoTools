@@ -1,9 +1,10 @@
 import SwiftUI
 import AppKit
+import PhotoKitShared
 
 /// 中央のファイル一覧テーブル（ドロップ受付兼用）。空のときは Empty state。
 struct FileTableView: View {
-    @EnvironmentObject var model: AppViewModel
+    @EnvironmentObject var model: JpegResizerViewModel
     @State private var isTargeted = false
 
     var body: some View {
@@ -44,7 +45,7 @@ struct FileTableView: View {
             TableColumn("寸法") { item in
                 cell {
                     Text(SizeFormat.dimensionBeforeAfter(
-                        original: item.pixelSize,
+                        original: item.extra.pixelSize,
                         output: outputDimension(item)))
                         .monospacedDigit()
                         .foregroundStyle(.secondary)
@@ -83,8 +84,8 @@ struct FileTableView: View {
 
     /// 表示する出力寸法。完了行は実際の出力寸法、未変換行は現在のリサイズ設定での予測寸法。
     private func outputDimension(_ item: FileItem) -> CGSize? {
-        if let out = item.outputPixelSize { return out }
-        guard let original = item.pixelSize else { return nil }
+        if let out = item.extra.outputPixelSize { return out }
+        guard let original = item.extra.pixelSize else { return nil }
         return model.plannedOutputSize(for: original)
     }
 

@@ -4,7 +4,7 @@ import SwiftUI
 /// - 左端: クリア
 /// - 右端: すべて変換 / 選択を変換 (件数) / 中止
 struct FooterBarView: View {
-    @EnvironmentObject var model: AppViewModel
+    @EnvironmentObject var model: JpegResizerViewModel
 
     var body: some View {
         HStack(spacing: 16) {

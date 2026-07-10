@@ -14,5 +14,6 @@ let package = Package(
         // UI 非依存の純粋ロジックと、機能に依存しない SwiftUI 部品のみを置く（機能固有ロジックは
         // 各機能モジュールに残す）。
         .target(name: "PhotoKitShared"),
+        .testTarget(name: "PhotoKitSharedTests", dependencies: ["PhotoKitShared"]),
     ]
 )

@@ -6,7 +6,7 @@ import PhotoKitShared
 /// ウィンドウ幅が広ければ 1 段に収め、狭ければ入り切らないセクション（SDR画像）が
 /// 次の段へ自動的に折り返す。実行ボタン（変換 / クリア）は画面下部の FooterBarView へ分離。
 struct ToolbarView: View {
-    @EnvironmentObject var model: AppViewModel
+    @EnvironmentObject var model: GainForgeViewModel
 
     var body: some View {
         FlowLayout(hSpacing: 16, vSpacing: 8) {

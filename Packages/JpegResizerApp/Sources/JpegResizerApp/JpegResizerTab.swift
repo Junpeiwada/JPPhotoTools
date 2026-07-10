@@ -5,7 +5,7 @@ import SwiftUI
 /// 元 JpegResizer アプリの `@main` が持っていた `AppViewModel` の生成・注入をこのタブが担い、
 /// 中身は既存の `ContentView` をそのまま表示する。タブ本体はビューワ等の別ウィンドウを持たない。
 public struct JpegResizerTab: View {
-    @StateObject private var model = AppViewModel()
+    @StateObject private var model = JpegResizerViewModel()
 
     public init() {}
 

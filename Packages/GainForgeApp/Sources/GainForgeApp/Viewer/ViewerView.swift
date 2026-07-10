@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import PhotoKitShared
 
 /// 比較ビューワ本体（別ウィンドウ）。上部にズーム操作、下に 1〜2 ペインの画像。
 /// 変換済み行は「変換前 / 変換後」、未変換行は「元画像のみ」を映す。

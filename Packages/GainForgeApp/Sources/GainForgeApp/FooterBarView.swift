@@ -1,11 +1,12 @@
 import SwiftUI
+import PhotoKitShared
 
 /// 画面下部（ステータスバーの直上）のアクションバー。
 /// - 左端: クリア
 /// - 右端: すべて変換 / 中止
 /// ツールバーから実行ボタンを分離し、常に画面下端の一定位置で押せるようにする。
 struct FooterBarView: View {
-    @EnvironmentObject var model: AppViewModel
+    @EnvironmentObject var model: GainForgeViewModel
 
     var body: some View {
         HStack(spacing: 16) {

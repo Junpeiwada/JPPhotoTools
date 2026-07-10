@@ -1,8 +1,9 @@
 import SwiftUI
+import PhotoKitShared
 
 /// 単一ウィンドウ・画面遷移なし。ツールバー / 一覧テーブル / ステータスバーの 3 エリア。
 struct ContentView: View {
-    @EnvironmentObject var model: AppViewModel
+    @EnvironmentObject var model: GainForgeViewModel
     @EnvironmentObject var viewer: ViewerModel
 
     var body: some View {

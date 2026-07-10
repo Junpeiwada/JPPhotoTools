@@ -1,8 +1,9 @@
 import SwiftUI
+import PhotoKitShared
 
 /// 単一ウィンドウ・画面遷移なし。ツールバー / 一覧テーブル / フッター / ステータスバーの 4 エリア。
 struct ContentView: View {
-    @EnvironmentObject var model: AppViewModel
+    @EnvironmentObject var model: JpegResizerViewModel
 
     var body: some View {
         VStack(spacing: 0) {

@@ -82,9 +82,9 @@ public final class ViewerModel: ObservableObject {
     func display(_ item: FileItem) {
         // 入力ファイル自体がゲインマップ（＝HDR表示可能）を持つか。
         // ラベルの SDR/HDR 表記・HDR(EDR)描画・チップ表示をこの実態に合わせる。
-        let inputHasGainMap = item.gainMap == .present
+        let inputHasGainMap = item.extra.gainMap == .present
         let panes: [Pane]
-        if item.hasComparableOutput, let output = item.outputURL {
+        if hasComparableOutput(item), let output = item.outputURL {
             // 既存検出（変換せずに見つけた HEIC）も、変換完了と同じく前後 2 ペインで比較する。
             let afterLabel = item.status == .existing ? "既存 HEIC (HDR)" : "変換後 (HDR)"
             panes = [
@@ -94,7 +94,7 @@ public final class ViewerModel: ObservableObject {
                      showGainMap: true, hasGainMap: inputHasGainMap),
                 Pane(url: output, name: output.lastPathComponent,
                      label: afterLabel, isHDR: true, bytes: item.outputBytes,
-                     showGainMap: true, hasGainMap: item.gainMap == .present),
+                     showGainMap: true, hasGainMap: item.extra.gainMap == .present),
             ]
         } else {
             panes = [

@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotoKitShared
 
 /// 統合アプリ（JPPhotoTools）の GainForge タブとして埋め込むための公開エントリ View。
 /// 内部で AppViewModel（タブ固有の状態）を保持し、既存の ContentView をそのまま表示する。
@@ -30,7 +31,7 @@ import SwiftUI
 /// }
 /// ```
 public struct GainForgeTab: View {
-    @StateObject private var model = AppViewModel()
+    @StateObject private var model = GainForgeViewModel()
     /// 比較ビューワの共有状態。統合アプリのルートで保持したものを環境から受け取り、
     /// ビューワ Window シーンと同一インスタンスを共有する。
     @EnvironmentObject private var viewer: ViewerModel
