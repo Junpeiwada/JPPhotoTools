@@ -20,6 +20,16 @@
 
 詳細は [Docs/アプリ概要.md](Docs/アプリ概要.md) を参照。
 
+## ドキュメントの目次生成
+
+`Docs/` 配下の Markdown に目次を付ける／更新するには、同梱の目次生成ツールを使う（Python 標準ライブラリのみ・依存なし）。
+
+```bash
+python3 Tools/GenDocsToc/gen_toc.py Docs/アプリ概要.md   # 「# タイトル」直後に「## 目次」を生成・更新（冪等）
+```
+
+詳細は [Tools/GenDocsToc/README.md](Tools/GenDocsToc/README.md) を参照。
+
 ## 動作環境
 
 - macOS（Apple Silicon）
