@@ -1,0 +1,55 @@
+import SwiftUI
+import CoreGraphics
+import PhotoKitShared
+
+extension RowStatus {
+    @MainActor @ViewBuilder var chip: some View {
+        switch self {
+        case .waiting:    Chip("待機", color: .secondary)
+        case .converting: Chip("変換中", systemImage: "clock", color: .blue, filled: true)
+        case .done:       Chip("完了", systemImage: "checkmark", color: .green, filled: true)
+        case .error:      Chip("エラー", systemImage: "exclamationmark.triangle", color: .red, filled: true)
+        case .skipped:    Chip("スキップ", color: .secondary)
+        }
+    }
+}
+
+/// バイト数・寸法の表記ヘルパ。
+enum SizeFormat {
+    static func mb(_ bytes: Int) -> String {
+        String(format: "%.1fMB", Double(bytes) / 1_048_576.0)
+    }
+
+    /// 変換前 → 変換後（未確定は "-" / "…"）。
+    static func beforeAfter(input: Int?, output: Int?, status: RowStatus) -> String {
+        let before = input.map(mb) ?? "-"
+        switch status {
+        case .done:
+            return "\(before) → \(output.map(mb) ?? "-")"
+        case .converting:
+            return "\(before) → …"
+        default:
+            return "\(before) → -"
+        }
+    }
+
+    /// 寸法（例 "3000×4000"）。nil は "-"。
+    static func dimension(_ size: CGSize?) -> String {
+        guard let size else { return "-" }
+        return "\(Int(size.width.rounded()))×\(Int(size.height.rounded()))"
+    }
+
+    /// 元寸法 → 出力寸法（例 "6000×4000 → 3840×2560"）。
+    static func dimensionBeforeAfter(original: CGSize?, output: CGSize?) -> String {
+        "\(dimension(original)) → \(dimension(output))"
+    }
+
+    /// 合計の削減率ラベル。容量が減ったらマイナス表示（例 `-72%`）、増えたら `+NN%`、変化なしは `±0%`。
+    /// input が 0（完了行なし）のときは空文字を返す。
+    static func reductionLabel(input: Int, output: Int) -> String {
+        guard input > 0 else { return "" }
+        let pct = Int((100.0 * (1.0 - Double(output) / Double(input))).rounded())
+        if pct == 0 { return "±0%" }
+        return pct > 0 ? "-\(pct)%" : "+\(-pct)%"
+    }
+}

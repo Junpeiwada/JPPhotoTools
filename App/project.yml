@@ -1,0 +1,55 @@
+name: JPPhotoTools
+options:
+  bundleIdPrefix: com.junpeiwada
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+
+packages:
+  # 各機能の「App 層」を独立ライブラリ化して依存する。GainForgeApp / JpegResizerApp は
+  # それぞれ内部で GainForgeCore / JpegResizerCore（External にコピー同梱）を path 参照で
+  # リンクするため、統合アプリからは App 層モジュールだけを見ればよい。型名（AppViewModel /
+  # FileItem 等）が両者で同名衝突するのを、モジュール境界で名前空間を分けて解消している。
+  # GainForgeCore の ML-LUT は Bundle.module 経由で解決され、パッケージ参照のまま保たれる。
+  GainForgeApp:
+    path: ../Packages/GainForgeApp
+  JpegResizerApp:
+    path: ../Packages/JpegResizerApp
+  # RAW-Trash は仕分け系でパイプラインが変換系2つと異なるため、共通シェルに乗せず
+  # 統合アプリ内の専用タブ（RawTrashTab）が Core を直接使う。
+  RawTrashCore:
+    path: ../Packages/RawTrashCore
+
+targets:
+  JPPhotoTools:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+    dependencies:
+      - package: GainForgeApp
+        product: GainForgeApp
+      - package: JpegResizerApp
+        product: JpegResizerApp
+      - package: RawTrashCore
+        product: RawTrashCore
+    info:
+      path: JPPhotoTools-Info.plist
+      properties:
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSApplicationCategoryType: public.app-category.photography
+        LSMinimumSystemVersion: "$(MACOSX_DEPLOYMENT_TARGET)"
+        NSHumanReadableCopyright: ""
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.junpeiwada.JPPhotoTools
+        PRODUCT_NAME: JPPhotoTools
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "6.0"
+        # ローカルツールのため App Sandbox は無効（入力隣への書き出しを許可）。
+        ENABLE_APP_SANDBOX: NO
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
