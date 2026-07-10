@@ -10,8 +10,8 @@ struct GeoTaggerTab: View {
 
     // ペイン寸法（元 app.ts の localStorage 'geo-sidebar-w' / 'geo-bottom-h' 相当）。
     @AppStorage("geoTaggerSidebarWidth") private var sidebarWidth: Double = 280
-    @AppStorage("geoTaggerMapHeight") private var mapHeight: Double = 320
-    @AppStorage("geoTaggerPreviewHeight") private var previewHeight: Double = 160
+    @AppStorage("geoTaggerMapHeight") private var mapHeight: Double = 380
+    @AppStorage("geoTaggerPreviewHeight") private var previewHeight: Double = 190
 
     @State private var selectedResult: MatchResult?
     @State private var isDropTargeted = false
@@ -30,7 +30,7 @@ struct GeoTaggerTab: View {
                 .frame(minHeight: 200, idealHeight: mapHeight)
 
                 PhotoPreviewPane(result: selectedResult)
-                    .frame(minHeight: 100, idealHeight: previewHeight, maxHeight: 240)
+                    .frame(minHeight: 130, idealHeight: previewHeight, maxHeight: 320)
 
                 PhotoTableView(results: viewModel.matchResults, selection: $viewModel.selection)
                     .frame(minHeight: 160)

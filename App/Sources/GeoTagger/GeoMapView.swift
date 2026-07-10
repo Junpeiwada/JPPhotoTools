@@ -63,10 +63,18 @@ struct GeoMapView: View {
             }
         }
         .mapStyle(isSatellite ? .hybrid : .standard)
+        .mapControls {
+            MapZoomStepper()
+            MapCompass()
+            MapScaleView()
+        }
         .overlay(alignment: .topTrailing) {
-            Button(isSatellite ? "地図" : "衛星") { isSatellite.toggle() }
-                .buttonStyle(.borderedProminent)
-                .padding(8)
+            HStack(spacing: 8) {
+                Button("全体表示") { fitBounds() }
+                Button(isSatellite ? "地図" : "衛星") { isSatellite.toggle() }
+            }
+            .buttonStyle(.borderedProminent)
+            .padding(8)
         }
         .onChange(of: mergedGpx?.points.count ?? 0) { _, newCount in
             fitBoundsIfNeeded(newCount)
@@ -77,9 +85,15 @@ struct GeoMapView: View {
         }
     }
 
+    /// トラック読み込み時（点列が変わった時）のみ自動 fit する。
     private func fitBoundsIfNeeded(_ pointCount: Int) {
         guard pointCount != lastFittedPointCount else { return }
         lastFittedPointCount = pointCount
+        fitBounds()
+    }
+
+    /// 「全体表示」ボタンなど、変化検知に関わらず常に実行する fit 本体。
+    private func fitBounds() {
         guard let points = mergedGpx?.points, !points.isEmpty else { return }
 
         var minLat = points[0].lat, maxLat = points[0].lat
@@ -88,7 +102,20 @@ struct GeoMapView: View {
             minLat = min(minLat, p.lat); maxLat = max(maxLat, p.lat)
             minLon = min(minLon, p.lon); maxLon = max(maxLon, p.lon)
         }
-        let center = CLLocationCoordinate2D(latitude: (minLat + maxLat) / 2, longitude: (minLon + maxLon) / 2)
+
+        // 経度の単純な min/max は180度子午線をまたぐ軌跡（例: 日本→米国の渡航ログ）で
+        // 破綻する（例: 139°E と -110°W の中点が本来太平洋上のはずが、単純平均だと
+        // ヨーロッパ付近になってしまう）。素な span が180度を超える場合は太平洋越えと
+        // みなし、負の経度を +360 して連続な数直線上で min/max を取り直す。
+        if maxLon - minLon > 180 {
+            let shifted = points.map { $0.lon < 0 ? $0.lon + 360 : $0.lon }
+            minLon = shifted.min()!
+            maxLon = shifted.max()!
+        }
+        var centerLon = (minLon + maxLon) / 2
+        if centerLon > 180 { centerLon -= 360 }
+
+        let center = CLLocationCoordinate2D(latitude: (minLat + maxLat) / 2, longitude: centerLon)
         // パディング分（元実装の [20, 20] px 相当）としてスパンを 1.3 倍余分に取る。
         let span = MKCoordinateSpan(
             latitudeDelta: max((maxLat - minLat) * 1.3, 0.01),

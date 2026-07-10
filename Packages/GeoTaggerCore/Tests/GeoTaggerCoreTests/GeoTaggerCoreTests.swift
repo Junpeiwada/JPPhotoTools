@@ -574,7 +574,8 @@ import CoreGraphics
     #expect(item.hasGps == false)
 }
 
-@Test func gpsWriterRoundTripWritesLatLonAndAltitude() throws {
+@Test(.enabled(if: GpsWriter.detectExiftool() != nil, "exiftool が見つからないためスキップ"))
+func gpsWriterRoundTripWritesLatLonAndAltitude() throws {
     let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
     defer { try? FileManager.default.removeItem(at: tmpDir) }
@@ -610,7 +611,8 @@ import CoreGraphics
     #expect(altRef == 0)
 }
 
-@Test func gpsWriterRoundTripOmitsAltitudeWhenNil() throws {
+@Test(.enabled(if: GpsWriter.detectExiftool() != nil, "exiftool が見つからないためスキップ"))
+func gpsWriterRoundTripOmitsAltitudeWhenNil() throws {
     let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
     defer { try? FileManager.default.removeItem(at: tmpDir) }
@@ -631,7 +633,8 @@ import CoreGraphics
     #expect(gps[kCGImagePropertyGPSAltitude] == nil)
 }
 
-@Test func gpsWriterRoundTripWritesLocalRewrite() throws {
+@Test(.enabled(if: GpsWriter.detectExiftool() != nil, "exiftool が見つからないためスキップ"))
+func gpsWriterRoundTripWritesLocalRewrite() throws {
     let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
     defer { try? FileManager.default.removeItem(at: tmpDir) }
@@ -648,7 +651,8 @@ import CoreGraphics
     #expect(item.offsetStr == "+09:00")
 }
 
-@Test func gpsWriterPreservesExistingGpsWhenOverwriting() throws {
+@Test(.enabled(if: GpsWriter.detectExiftool() != nil, "exiftool が見つからないためスキップ"))
+func gpsWriterPreservesExistingGpsWhenOverwriting() throws {
     let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
     try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
     defer { try? FileManager.default.removeItem(at: tmpDir) }

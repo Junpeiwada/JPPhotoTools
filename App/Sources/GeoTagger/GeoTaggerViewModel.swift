@@ -47,6 +47,9 @@ final class GeoTaggerViewModel: ObservableObject {
     @Published var busy: Bool = false
     /// (完了数, 総数)。0 件時は nil で非表示。
     @Published private(set) var loadProgress: (done: Int, total: Int)?
+    /// GPX パース進捗 (完了数, 総数)。nil で非表示。GeoShutter 自動読み込みは数十ファイルに
+    /// 及び数十秒かかりうるため、ボタン無効化だけでは「動いている」ことが伝わらない。
+    @Published private(set) var gpxLoadProgress: (done: Int, total: Int)?
     @Published private(set) var applyProgress: (done: Int, total: Int, success: Int, failed: Int)?
     @Published private(set) var applySummary: String?
 
@@ -113,6 +116,10 @@ final class GeoTaggerViewModel: ObservableObject {
         matchResults.filter { $0.status == .warning }.count
     }
 
+    var skipCount: Int {
+        matchResults.filter { $0.status == .skip }.count
+    }
+
     var canApply: Bool {
         !busy && matchResults.contains { $0.status == .ok }
     }
@@ -160,28 +167,73 @@ final class GeoTaggerViewModel: ObservableObject {
     // MARK: - GPX 操作
 
     /// .gpx を追加する。重複パスは無視。パース失敗・空ファイルも無視。
+    /// パース（XML ストリーミング、GeoShutter 自動読み込みは数十ファイルに及ぶことがある）は
+    /// メインスレッドをブロックしないようバックグラウンドで実行する。
+    ///
+    /// `XMLParser` の同期パースは async な一時停止点を持たない CPU 拘束処理のため、
+    /// `TaskGroup`/`Task.detached` に直接乗せると Swift Concurrency の協調スレッドプール
+    /// （コア数で固定サイズ）を専有し、無関係な MainActor の処理まで数秒〜十数秒単位で
+    /// 遅延することを実測で確認した（同時実行数をコア数に制限しても軽減はするが解消しない）。
+    /// そのため各ファイルのパースは `DispatchQueue.global()`（伸縮可能なスレッドプール）に
+    /// 逃がし、`withCheckedContinuation` で async に橋渡しする。
     func addGpxFiles(_ urls: [URL]) {
-        var added = false
-        for url in urls {
-            guard url.pathExtension.lowercased() == "gpx" else { continue }
-            guard !loadedGpxFiles.contains(where: { $0.url == url }) else { continue }
-            guard let data = try? GpxParser.parse(contentsOf: url), !data.points.isEmpty else { continue }
-            loadedGpxFiles.append((url, data))
-            added = true
+        let newUrls = urls.filter { url in
+            url.pathExtension.lowercased() == "gpx" && !loadedGpxFiles.contains(where: { $0.url == url })
         }
-        guard added else { return }
-        recomputeMergedGpx()
-        if !photoItems.isEmpty { runPreview() }
+        guard !newUrls.isEmpty else { return }
+        Task { await parseAndAppendGpxFiles(newUrls) }
+    }
+
+    private func parseAndAppendGpxFiles(_ urls: [URL]) async {
+        busy = true
+        gpxLoadProgress = (0, urls.count)
+        defer {
+            busy = false
+            gpxLoadProgress = nil
+        }
+
+        let parsed = await withTaskGroup(of: (URL, GpxData?).self) { group -> [URL: GpxData] in
+            for url in urls {
+                group.addTask { (url, await Self.parseGpxOffCooperativePool(url)) }
+            }
+            var byURL: [URL: GpxData] = [:]
+            var done = 0
+            for await (url, data) in group {
+                if let data {
+                    byURL[url] = data
+                }
+                done += 1
+                gpxLoadProgress = (done, urls.count)
+            }
+            return byURL
+        }
+        guard !parsed.isEmpty else { return }
+
+        // 追加順を維持するため urls の順で並べ直す（元実装踏襲）
+        for url in urls {
+            if let data = parsed[url] {
+                loadedGpxFiles.append((url, data))
+            }
+        }
+        await recomputeMergedGpxAndPreview()
+    }
+
+    /// `XMLParser` の同期パースを `DispatchQueue.global()`（伸縮可能なスレッドプール）上で実行し、
+    /// Swift Concurrency の協調スレッドプールを占有しないようにする。QoS は `.utility`
+    /// （進捗表示のあるバックグラウンド一括処理向け）にして、OS スケジューラがメインスレッドを
+    /// 優先できるようにする。
+    private nonisolated static func parseGpxOffCooperativePool(_ url: URL) async -> GpxData? {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .utility).async {
+                let data = try? GpxParser.parse(contentsOf: url)
+                continuation.resume(returning: (data?.points.isEmpty == false) ? data : nil)
+            }
+        }
     }
 
     func removeGpxFile(_ url: URL) {
         loadedGpxFiles.removeAll { $0.url == url }
-        recomputeMergedGpx()
-        if mergedGpx == nil {
-            resetMatchResultsToPending()
-        } else if !photoItems.isEmpty {
-            runPreview()
-        }
+        Task { await recomputeMergedGpxAndPreview() }
     }
 
     func clearGpxFiles() {
@@ -190,8 +242,25 @@ final class GeoTaggerViewModel: ObservableObject {
         resetMatchResultsToPending()
     }
 
-    private func recomputeMergedGpx() {
-        mergedGpx = loadedGpxFiles.isEmpty ? nil : GpxParser.merge(loadedGpxFiles.map(\.data))
+    /// GPX マージ（数十万〜百万点規模になりうる）とマッチングをバックグラウンドで実行する。
+    private func recomputeMergedGpxAndPreview() async {
+        let dataList = loadedGpxFiles.map(\.data)
+        guard !dataList.isEmpty else {
+            mergedGpx = nil
+            resetMatchResultsToPending()
+            return
+        }
+
+        busy = true
+        defer { busy = false }
+
+        let merged = await Task.detached(priority: .userInitiated) {
+            GpxParser.merge(dataList)
+        }.value
+        mergedGpx = merged
+
+        guard !photoItems.isEmpty else { return }
+        await runPreviewAsync(gpx: merged)
     }
 
     private func resetMatchResultsToPending() {
@@ -271,11 +340,26 @@ final class GeoTaggerViewModel: ObservableObject {
 
     func runPreview() {
         guard let mergedGpx, !photoItems.isEmpty else { return }
-        matchResults = Matcher.matchAll(gpxPoints: mergedGpx.points, photos: photoItems, options: options)
+        Task { await runPreviewAsync(gpx: mergedGpx) }
+    }
+
+    /// マッチング本体（写真数 × GPX 点数）をバックグラウンドで実行する。
+    private func runPreviewAsync(gpx: GpxData) async {
+        let photos = photoItems
+        let opts = options
+        let results = await Task.detached(priority: .userInitiated) {
+            Matcher.matchAll(gpxPoints: gpx.points, photos: photos, options: opts)
+        }.value
+        matchResults = results
     }
 
     // MARK: - 付与
 
+    /// GPS/日時タグの書き込み。`GpsWriter.write` は exiftool サブプロセスを起動して
+    /// `waitUntilExit()` するため同期ブロッキング呼び出しであり、GPX パースと同じ理由で
+    /// `@MainActor` 上で直接呼ぶとメインスレッドが写真枚数 × exiftool 起動コストぶん
+    /// フリーズする（実測で確認済み）。`DispatchQueue.global(qos: .utility)` へ逃がし、
+    /// コア数を上限に並列実行する（書き込み先はファイルごとに異なるため競合しない）。
     func runApply() async {
         let targets = matchResults.enumerated().filter { $0.element.status == .ok }
         guard !targets.isEmpty else { return }
@@ -295,6 +379,7 @@ final class GeoTaggerViewModel: ObservableObject {
             resolver = timeZoneResolver
         }
 
+        var items: [(index: Int, request: GpsWriteRequest)] = []
         for (index, result) in targets {
             guard let match = result.match, let utcTime = result.utcTime else { continue }
 
@@ -312,24 +397,62 @@ final class GeoTaggerViewModel: ObservableObject {
                 ele: match.point.ele,
                 localRewrite: localRewrite
             )
-
-            do {
-                try GpsWriter.write(request)
-                matchResults[index].status = .done
-                matchResults[index].statusLabel = "✓ 書込済"
-                success += 1
-            } catch {
-                matchResults[index].status = .error
-                matchResults[index].statusLabel = "⚠ 書込失敗"
-                failed += 1
-            }
-
-            applyProgress = (success + failed, total, success, failed)
+            items.append((index, request))
         }
+
+        // matchResults への書き込みを1件ごとに @Published へ反映すると、並列化により
+        // 同一フレーム内で複数回発火して SwiftUI から
+        // "onChange(of: Array<MatchResult>) action tried to update multiple times per frame"
+        // という警告が出る（実測で確認済み）。ローカルコピーへ溜めてから間引いて反映する。
+        let maxConcurrent = max(1, ProcessInfo.processInfo.activeProcessorCount)
+        var localResults = matchResults
+        let flushBatchSize = 20
+        await withTaskGroup(of: (Int, Bool).self) { group in
+            var iterator = items.makeIterator()
+            func addNext() {
+                guard let item = iterator.next() else { return }
+                group.addTask { (item.index, await Self.writeGpsOffCooperativePool(item.request)) }
+            }
+            for _ in 0..<maxConcurrent { addNext() }
+
+            var sinceFlush = 0
+            while let (index, ok) = await group.next() {
+                if ok {
+                    localResults[index].status = .done
+                    localResults[index].statusLabel = "✓ 書込済"
+                    success += 1
+                } else {
+                    localResults[index].status = .error
+                    localResults[index].statusLabel = "⚠ 書込失敗"
+                    failed += 1
+                }
+                applyProgress = (success + failed, total, success, failed)
+                sinceFlush += 1
+                if sinceFlush >= flushBatchSize {
+                    matchResults = localResults
+                    sinceFlush = 0
+                }
+                addNext()
+            }
+        }
+        matchResults = localResults
 
         applySummary = "完了：成功 \(success) 件 / 失敗 \(failed) 件"
         applyProgress = nil
         busy = false
+    }
+
+    private nonisolated static func writeGpsOffCooperativePool(_ request: GpsWriteRequest) async -> Bool {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .utility).async {
+                do {
+                    try GpsWriter.write(request)
+                    continuation.resume(returning: true)
+                } catch {
+                    continuation.resume(returning: false)
+                }
+            }
+        }
     }
 }
 
@@ -342,7 +465,7 @@ enum GeoTaggerFormat {
     static func datetimeRaw(_ raw: String, offsetStr: String?) -> String {
         guard !raw.isEmpty else { return "—" }
         let prefix = String(raw.prefix(16))
-        var parts = prefix.split(separator: " ", maxSplits: 1).map(String.init)
+        let parts = prefix.split(separator: " ", maxSplits: 1).map(String.init)
         guard let datePart = parts.first else { return "—" }
         let dateComponents = datePart.split(separator: ":")
         guard dateComponents.count == 3 else { return "—" }

@@ -44,6 +44,13 @@ struct GpxSidebarView: View {
                     .disabled(viewModel.busy || viewModel.loadedGpxFiles.isEmpty)
             }
 
+            if let gpxLoadProgress = viewModel.gpxLoadProgress {
+                ProgressView(value: Double(gpxLoadProgress.done), total: Double(gpxLoadProgress.total))
+                Text("GPX を読み込み中… \(gpxLoadProgress.done) / \(gpxLoadProgress.total)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             if viewModel.loadedGpxFiles.isEmpty {
                 Text("ここに GPX をドロップ（複数可）")
                     .font(.caption)
@@ -113,7 +120,7 @@ struct GpxSidebarView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else if !viewModel.photoItems.isEmpty {
-                Text("\(viewModel.photoItems.count) 枚  ✓ \(viewModel.okCount)件  ⚠ \(viewModel.warningCount)件")
+                Text("\(viewModel.photoItems.count) 枚  ✓ \(viewModel.okCount)件  ⚠ \(viewModel.warningCount)件  — \(viewModel.skipCount)件")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -122,6 +129,12 @@ struct GpxSidebarView: View {
                 Text("⚠ OffsetTimeOriginal がないファイルが \(viewModel.noOffsetCount) 枚あります（手動 TZ を検討してください）。")
                     .font(.caption)
                     .foregroundStyle(.orange)
+            }
+
+            if !viewModel.overwriteGps && viewModel.skipCount > 0 {
+                Text("— \(viewModel.skipCount) 件は既に GPS が付いているためスキップされています。上書きするには下の「既存の GPS タグを上書き」を ON にしてください。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
     }
