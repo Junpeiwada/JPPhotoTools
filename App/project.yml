@@ -19,6 +19,10 @@ packages:
   # 統合アプリ内の専用タブ（RawTrashTab）が Core を直接使う。
   RawTrashCore:
     path: ../Packages/RawTrashCore
+  # GeoTagger も RAW-Trash と同様、GPX・地図・マッチングを持つ独自パイプラインのため
+  # 共通シェルに乗せず、統合アプリ内の専用タブ（GeoTaggerTab）が Core を直接使う。
+  GeoTaggerCore:
+    path: ../Packages/GeoTaggerCore
 
 targets:
   JPPhotoTools:
@@ -33,6 +37,8 @@ targets:
         product: JpegResizerApp
       - package: RawTrashCore
         product: RawTrashCore
+      - package: GeoTaggerCore
+        product: GeoTaggerCore
     info:
       path: JPPhotoTools-Info.plist
       properties:

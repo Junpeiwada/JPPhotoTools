@@ -2,12 +2,13 @@ import SwiftUI
 import GainForgeApp
 import JpegResizerApp
 
-/// 統合アプリのタブ器。撮影後の処理を時系列順に3タブで並べる。
+/// 統合アプリのタブ器。撮影後の処理を時系列順に4タブで並べる。
 ///
 /// 各タブの中身:
 ///   - 取り込み・整理: RawTrashTab（統合アプリ内・RawTrashCore を直接使用）
 ///   - HDR 変換: GainForgeTab（GainForgeApp モジュール）
 ///   - リサイズ書き出し: JpegResizerTab（JpegResizerApp モジュール）
+///   - ジオタグ: GeoTaggerTab（統合アプリ内・GeoTaggerCore を直接使用）
 ///
 /// GainForge タブは比較ビューワ（別ウィンドウ）の共有状態 `ViewerModel` をルートから
 /// environmentObject で受け取り、そのままタブへ引き渡す。
@@ -16,7 +17,7 @@ struct ContentView: View {
     @EnvironmentObject private var gainForgeViewer: ViewerModel
 
     enum Tab: Hashable {
-        case organize, hdr, resize
+        case organize, hdr, resize, geoTagger
     }
     @State private var selection: Tab = .organize
 
@@ -34,6 +35,10 @@ struct ContentView: View {
             JpegResizerTab()
                 .tabItem { Label("リサイズ書き出し", systemImage: "arrow.down.right.and.arrow.up.left") }
                 .tag(Tab.resize)
+
+            GeoTaggerTab()
+                .tabItem { Label("ジオタグ", systemImage: "mappin.and.ellipse") }
+                .tag(Tab.geoTagger)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
