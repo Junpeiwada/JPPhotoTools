@@ -23,6 +23,10 @@ packages:
   # 共通シェルに乗せず、統合アプリ内の専用タブ（GeoTaggerTab）が Core を直接使う。
   GeoTaggerCore:
     path: ../Packages/GeoTaggerCore
+  # アプリ内自動更新フレームワーク。GitHub Pages の appcast を参照して更新する。
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: "2.9.3"
 
 targets:
   JPPhotoTools:
@@ -39,6 +43,10 @@ targets:
         product: RawTrashCore
       - package: GeoTaggerCore
         product: GeoTaggerCore
+      - package: Sparkle
+        product: Sparkle
+    # Sparkle の任意キー（SUFeedURL/SUPublicEDKey）は INFOPLIST_KEY_* では注入できないため、
+    # 実 Info.plist を XcodeGen で生成する。設定変更時は project.yml を編集して再生成すること。
     info:
       path: JPPhotoTools-Info.plist
       properties:
@@ -47,6 +55,15 @@ targets:
         LSApplicationCategoryType: public.app-category.photography
         LSMinimumSystemVersion: "$(MACOSX_DEPLOYMENT_TARGET)"
         NSHumanReadableCopyright: ""
+        # Sparkle: 更新フィード（GitHub Pages でホストする appcast）
+        SUFeedURL: "https://junpeiwada.github.io/JPPhotoTools/appcast.xml"
+        # Sparkle: appcast 署名検証用の EdDSA 公開鍵。
+        # `generate_keys` で生成した公開鍵に置き換える（公開鍵なのでリポジトリに含めてよい）。
+        # 対応する秘密鍵はキーチェーンに保存され、CI 署名用に Secret SPARKLE_PRIVATE_KEY へ登録する。
+        SUPublicEDKey: "REPLACE_WITH_SPARKLE_ED_PUBLIC_KEY"
+        # 起動時に自動で更新確認（既定 ON、間隔 24h）。ユーザーは About 画面で切替可能。
+        SUEnableAutomaticChecks: true
+        SUScheduledCheckInterval: 86400
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.junpeiwada.JPPhotoTools
@@ -54,6 +71,7 @@ targets:
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "6.0"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         # ローカルツールのため App Sandbox は無効（入力隣への書き出しを許可）。
         ENABLE_APP_SANDBOX: NO
         ENABLE_HARDENED_RUNTIME: YES

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JPPhotoTools — 撮影後の写真ワークフローを一本化する macOS アプリ</title>
+<meta name="description" content="RAW/JPG の仕分け、HDR ゲインマップ HEIC 変換、共有用リサイズ、GPS ジオタグ付けを 1 つのアプリに集約した macOS 統合デスクトップアプリ。">
+<meta property="og:title" content="JPPhotoTools">
+<meta property="og:description" content="撮影後の写真ワークフローを一本化する macOS 統合デスクトップアプリ">
+<meta property="og:image" content="https://junpeiwada.github.io/JPPhotoTools/icon.png">
+<link rel="canonical" href="https://junpeiwada.github.io/JPPhotoTools/">
+<link rel="icon" href="icon.png">
+<style>
+  :root{
+    --bg:#0e1014; --panel:#171a21; --line:#262b35;
+    --fg:#e8eaed; --muted:#9aa3b2; --accent:#4c8dff; --accent2:#6ad0b3;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Helvetica Neue",Arial,sans-serif;
+    line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px}
+
+  /* Hero */
+  .hero{text-align:center;padding:84px 24px 48px;
+    background:radial-gradient(1200px 500px at 50% -10%, rgba(76,141,255,.18), transparent 60%);}
+  .icon{width:120px;height:120px;border-radius:27%;box-shadow:0 18px 50px rgba(0,0,0,.5);}
+  h1{font-size:52px;letter-spacing:.5px;margin:22px 0 6px;font-weight:800}
+  .tag{font-size:19px;color:var(--muted);max-width:640px;margin:0 auto}
+
+  .cta{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;margin:34px 0 10px}
+  .btn{display:inline-flex;align-items:center;gap:10px;padding:15px 28px;border-radius:13px;
+    font-size:17px;font-weight:700;text-decoration:none;transition:transform .12s ease,box-shadow .12s ease}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a1020;
+    box-shadow:0 10px 30px rgba(76,141,255,.35)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 38px rgba(76,141,255,.45)}
+  .btn-ghost{border:1px solid var(--line);color:var(--fg)}
+  .btn-ghost:hover{border-color:var(--accent)}
+  .req{font-size:13.5px;color:var(--muted);margin-top:8px}
+  .req b{color:#cdd3dd;font-weight:600}
+
+  /* Features */
+  .features{padding:56px 0 20px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  @media(max-width:680px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px 24px}
+  .card h3{font-size:19px;margin-bottom:8px}
+  .card .from{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.3px}
+  .card p{color:var(--muted);font-size:15px;margin-top:6px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
+
+  /* Note */
+  .note{margin:40px 0 8px;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;padding:22px 24px;color:var(--muted);font-size:14.5px}
+  .note code{background:#0b0d12;border:1px solid var(--line);border-radius:6px;
+    padding:2px 7px;color:#cfe0ff;font-size:13px}
+
+  footer{text-align:center;color:var(--muted);font-size:13.5px;padding:48px 24px 60px}
+  footer a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <img class="icon" src="icon.png" alt="JPPhotoTools アイコン">
+  <h1>JPPhotoTools</h1>
+  <p class="tag">撮影後の写真ワークフローを一本化する macOS 統合デスクトップアプリ。
+    仕分け・HDR 変換・リサイズ・ジオタグを、タブで切り替える 1 つのアプリに集約。</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="https://github.com/Junpeiwada/JPPhotoTools/releases/latest">ダウンロード（最新版）</a>
+    <a class="btn btn-ghost" href="https://github.com/Junpeiwada/JPPhotoTools">GitHub</a>
+  </div>
+  <p class="req">動作環境: <b>macOS 15 以降（Apple Silicon）</b> ／ ジオタグ書き込みには <b>exiftool</b> が必要</p>
+</section>
+
+<div class="wrap">
+  <section class="features">
+    <div class="grid">
+      <div class="card">
+        <div class="from">RAW-Trash 由来</div>
+        <h3><span class="dot" style="background:#4c8dff"></span>取り込み・整理</h3>
+        <p>RAW/JPG ペアの仕分け、孤立した RAW の退避。撮影後の最初の交通整理を安全に。</p>
+      </div>
+      <div class="card">
+        <div class="from">GainForge 由来</div>
+        <h3><span class="dot" style="background:#a880ff"></span>HDR 変換</h3>
+        <p>ゲインマップを保持したまま HEIC を生成。写真アプリと同じ HDR 構造で書き出す。</p>
+      </div>
+      <div class="card">
+        <div class="from">JpegResizer 由来</div>
+        <h3><span class="dot" style="background:#6ad0b3"></span>リサイズ書き出し</h3>
+        <p>共有用に高品質な JPEG へリサイズ。アスペクト比を保ったまま一括で縮小。</p>
+      </div>
+      <div class="card">
+        <div class="from">GeoTagger 由来</div>
+        <h3><span class="dot" style="background:#ffc24b"></span>ジオタグ付け</h3>
+        <p>GPX トラックログと撮影時刻を突き合わせ、写真へ GPS・日時タグを書き込む。</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <b style="color:#cdd3dd">exiftool について:</b>
+      ジオタグタブの GPS／日時書き込みは <a href="https://exiftool.org/" style="color:#4c8dff">exiftool</a> を利用します。
+      アプリには同梱していないため、別途インストールしてください（例: <code>brew install exiftool</code>）。
+      他のタブは exiftool なしでも動作します。
+    </div>
+  </section>
+</div>
+
+<footer>
+  アプリ内に自動更新（Sparkle）を内蔵しています。&nbsp;·&nbsp;
+  <a href="https://github.com/Junpeiwada/JPPhotoTools/blob/main/LICENSE">MIT License</a> &nbsp;·&nbsp;
+  © 2026 junpeiwada
+</footer>
+
+</body>
+</html>
