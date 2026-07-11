@@ -18,6 +18,16 @@ struct ContentView: View {
 
     enum Tab: Hashable {
         case organize, hdr, resize, geoTagger
+
+        /// タブの署名色（機能別マルチ差し色）。選択中タブの色を tint として流す。
+        var accent: Color {
+            switch self {
+            case .organize:  return Palette.tabOrganize
+            case .hdr:       return Palette.tabHDR
+            case .resize:    return Palette.tabResize
+            case .geoTagger: return Palette.tabGeo
+            }
+        }
     }
     @State private var selection: Tab = .organize
 
@@ -41,5 +51,10 @@ struct ContentView: View {
                 .tag(Tab.geoTagger)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // 差し色: 選択中タブの署名色を environment の tint として流す。別モジュールの
+        // タブ配下のコントロール（ボタン・選択ハイライト等）にもこの色が伝播する。
+        .tint(selection.accent)
+        // 黒基調カラースキーム: システム設定によらず常にダーク表示で固定する。
+        .preferredColorScheme(.dark)
     }
 }

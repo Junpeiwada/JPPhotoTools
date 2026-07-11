@@ -513,11 +513,11 @@ enum GeoTaggerFormat {
 
     static func statusColor(_ status: MatchStatus) -> Color {
         switch status {
-        case .ok, .done: return .green
-        case .warning: return .orange
-        case .error: return .red
-        case .skip: return .gray
-        case .pending: return .secondary
+        case .ok, .done: return Palette.success
+        case .warning: return Palette.warning
+        case .error: return Palette.danger
+        case .skip: return Palette.neutral
+        case .pending: return Palette.text2
         }
     }
 }

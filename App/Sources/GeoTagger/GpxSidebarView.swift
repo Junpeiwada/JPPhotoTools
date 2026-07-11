@@ -128,7 +128,7 @@ struct GpxSidebarView: View {
             if viewModel.noOffsetCount > 0 {
                 Text("⚠ OffsetTimeOriginal がないファイルが \(viewModel.noOffsetCount) 枚あります（手動 TZ を検討してください）。")
                     .font(.caption)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(Palette.warning)
             }
 
             if !viewModel.overwriteGps && viewModel.skipCount > 0 {

@@ -15,9 +15,7 @@ struct PhotoPreviewPane: View {
         HStack(alignment: .center, spacing: 20) {
             Group {
                 if let thumbnail {
-                    Image(nsImage: thumbnail)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
+                    HDRImageView(image: thumbnail)
                 } else {
                     RoundedRectangle(cornerRadius: 8)
                         .fill(.quaternary)
@@ -74,6 +72,7 @@ struct PhotoPreviewPane: View {
     }
 
     /// NSImage で直接・非同期読み込み（元実装の Base64 経由読み込みは不要）。
+    // （HDR 描画は末尾の HDRImageView が担う）
     private func loadThumbnail(for result: MatchResult?) {
         guard let url = result?.photo.url else {
             thumbnail = nil
@@ -90,5 +89,30 @@ struct PhotoPreviewPane: View {
                 thumbnail = image
             }
         }
+    }
+}
+
+/// `NSImageView` を EDR（HDR）描画有効でラップする。
+/// SwiftUI の `Image(nsImage:)` は EDR 描画パスを持たず SDR にクランプされるため、
+/// HDR 画像（ゲインマップ付き HEIC/JPEG など）を正しく表示するには AppKit のビューが必要。
+private struct HDRImageView: NSViewRepresentable {
+    let image: NSImage
+
+    func makeNSView(context: Context) -> NSImageView {
+        let view = NSImageView()
+        view.imageScaling = .scaleProportionallyUpOrDown
+        view.imageAlignment = .alignCenter
+        // 拡張ダイナミックレンジで描画（対応ディスプレイでハイライトが伸びる）
+        view.preferredImageDynamicRange = .high
+        // 枠に追従して縮小できるよう圧縮抵抗を下げる
+        view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        view.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        view.image = image
+        return view
+    }
+
+    func updateNSView(_ nsView: NSImageView, context: Context) {
+        nsView.image = image
+        nsView.preferredImageDynamicRange = .high
     }
 }

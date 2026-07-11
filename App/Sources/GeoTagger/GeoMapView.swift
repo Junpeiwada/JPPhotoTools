@@ -55,7 +55,7 @@ struct GeoMapView: View {
             ForEach(pins, id: \.result.id) { pin in
                 Annotation(pin.result.photo.url.lastPathComponent, coordinate: pin.coordinate) {
                     Circle()
-                        .fill(pin.result.photo.url == selection ? Color.blue : Color.red)
+                        .fill(pin.result.photo.url == selection ? Palette.info : Palette.danger)
                         .frame(width: 14, height: 14)
                         .overlay(Circle().stroke(.white, lineWidth: 2))
                         .onTapGesture { selection = pin.result.photo.url }

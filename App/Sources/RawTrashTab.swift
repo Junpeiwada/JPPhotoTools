@@ -46,7 +46,7 @@ struct RawTrashTab: View {
             }
             if let errorMessage {
                 Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.red)
+                    .foregroundStyle(Palette.danger)
                     .font(.callout)
             }
 
@@ -80,14 +80,14 @@ struct RawTrashTab: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("仕分け完了（合計 \(r.total) 件）").font(.headline)
             HStack(spacing: 16) {
-                countChip("Del", r.deleted, .red)
-                countChip("RAW", r.raw, .blue)
-                countChip("JPG", r.jpg, .green)
+                countChip("Del", r.deleted, Palette.danger)
+                countChip("RAW", r.raw, Palette.info)
+                countChip("JPG", r.jpg, Palette.success)
             }
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+        .background(Palette.elevated, in: RoundedRectangle(cornerRadius: 8))
     }
 
     private func countChip(_ label: String, _ count: Int, _ color: Color) -> some View {
