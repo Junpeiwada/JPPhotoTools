@@ -3,12 +3,12 @@
     <channel>
         <title>JPPhotoTools</title>
         <item>
-            <title>0.1.0</title>
-            <pubDate>Sun, 12 Jul 2026 02:55:30 +0000</pubDate>
-            <sparkle:version>1</sparkle:version>
-            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <title>0.1.1</title>
+            <pubDate>Sun, 12 Jul 2026 03:11:12 +0000</pubDate>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>0.1.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/Junpeiwada/JPPhotoTools/releases/download/v0.1.0/JPPhotoTools-0.1.0.zip" length="6951013" type="application/octet-stream" sparkle:edSignature="PV7+8lUUrQqCWIDfnj/h1ilNzVmr15CpWmvUBwnk07bHZAkpJYfabTYNq46C3+u2aVaEzImwmCmwQgCpGRCYCw=="/>
+            <enclosure url="https://github.com/Junpeiwada/JPPhotoTools/releases/download/v0.1.1/JPPhotoTools-0.1.1.zip" length="6950972" type="application/octet-stream" sparkle:edSignature="nlJtoyVgjQ1f+gCrfzvUFTEBREgc/yaP0LoQgefe5vaibr1HhORi5RF7gtUG/nO0mKFIiKwZUSPfLpq2q7v4Bg=="/>
         </item>
     </channel>
 </rss>
