@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>JPPhotoTools</title>
+        <item>
+            <title>0.1.0</title>
+            <pubDate>Sun, 12 Jul 2026 02:55:30 +0000</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/Junpeiwada/JPPhotoTools/releases/download/v0.1.0/JPPhotoTools-0.1.0.zip" length="6951013" type="application/octet-stream" sparkle:edSignature="PV7+8lUUrQqCWIDfnj/h1ilNzVmr15CpWmvUBwnk07bHZAkpJYfabTYNq46C3+u2aVaEzImwmCmwQgCpGRCYCw=="/>
+        </item>
+    </channel>
+</rss>
