@@ -20,3 +20,9 @@ xcuserdata/
 # Python
 __pycache__/
 *.pyc
+
+# Tools 共通 venv（マシンごとに作成。コミットしない）
+.venv/
+
+# Node（開発補助スクリプト用 package.json。依存は無いが念のため）
+node_modules/

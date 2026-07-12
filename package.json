@@ -1,0 +1,9 @@
+{
+  "name": "jpphototools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "開発補助スクリプト用の package.json（アプリ本体は Swift/Xcode。依存なし）。VSCode の NPM SCRIPTS からリリースを実行するために置いている。",
+  "scripts": {
+    "release": "bash Tools/release.sh"
+  }
+}

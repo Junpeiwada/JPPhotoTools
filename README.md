@@ -46,6 +46,29 @@ brew install exiftool
 
 未インストールの場合、他タブ（取り込み・整理／HDR 変換／リサイズ書き出し）は動作するが、GeoTagger の書き込みはエラーになる。
 
+## ビルド / 実行
+
+Xcode プロジェクトは [App/](App/) 配下にある（`App/JPPhotoTools.xcodeproj`）。
+
+```sh
+open App/JPPhotoTools.xcodeproj
+# Xcode で JPPhotoTools スキームを Run
+
+# プロジェクトファイルは XcodeGen 管理（App/project.yml が真実のソース）。
+# ターゲット・依存・Info.plist 設定を変えたら再生成する:
+cd App && xcodegen generate
+```
+
+## テスト
+
+ロジックのユニットテストは各 Core パッケージ側にある（SwiftPM）。パッケージディレクトリで `swift test`:
+
+```sh
+cd Packages/GeoTaggerCore && swift test
+cd Packages/RawTrashCore  && swift test
+cd Packages/PhotoKitShared && swift test
+```
+
 ## ダウンロード
 
 [Releases](https://github.com/Junpeiwada/JPPhotoTools/releases) から最新版の `.app`（zip）を入手できる。
