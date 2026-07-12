@@ -29,7 +29,7 @@
 	<key>SUFeedURL</key>
 	<string>https://junpeiwada.github.io/JPPhotoTools/appcast.xml</string>
 	<key>SUPublicEDKey</key>
-	<string>REPLACE_WITH_SPARKLE_ED_PUBLIC_KEY</string>
+	<string>WiyUPbS5LnynuM2+J8Z/n+nRIhbjDpwtD/rbmcWeGVg=</string>
 	<key>SUScheduledCheckInterval</key>
 	<integer>86400</integer>
 </dict>

@@ -60,7 +60,7 @@ targets:
         # Sparkle: appcast 署名検証用の EdDSA 公開鍵。
         # `generate_keys` で生成した公開鍵に置き換える（公開鍵なのでリポジトリに含めてよい）。
         # 対応する秘密鍵はキーチェーンに保存され、CI 署名用に Secret SPARKLE_PRIVATE_KEY へ登録する。
-        SUPublicEDKey: "REPLACE_WITH_SPARKLE_ED_PUBLIC_KEY"
+        SUPublicEDKey: "WiyUPbS5LnynuM2+J8Z/n+nRIhbjDpwtD/rbmcWeGVg="
         # 起動時に自動で更新確認（既定 ON、間隔 24h）。ユーザーは About 画面で切替可能。
         SUEnableAutomaticChecks: true
         SUScheduledCheckInterval: 86400
