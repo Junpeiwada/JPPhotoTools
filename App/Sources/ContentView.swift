@@ -6,7 +6,7 @@ import JpegResizerApp
 ///
 /// 各タブの中身:
 ///   - 取り込み・整理: RawTrashTab（統合アプリ内・RawTrashCore を直接使用）
-///   - HDR 変換: GainForgeTab（GainForgeApp モジュール）
+///   - HEIC 変換: GainForgeTab（GainForgeApp モジュール）
 ///   - リサイズ書き出し: JpegResizerTab（JpegResizerApp モジュール）
 ///   - ジオタグ: GeoTaggerTab（統合アプリ内・GeoTaggerCore を直接使用）
 ///
@@ -39,7 +39,7 @@ struct ContentView: View {
 
             GainForgeTab()
                 .environmentObject(gainForgeViewer)
-                .tabItem { Label("HDR 変換", systemImage: "camera.filters") }
+                .tabItem { Label("HEIC 変換", systemImage: "camera.filters") }
                 .tag(Tab.hdr)
 
             JpegResizerTab()
