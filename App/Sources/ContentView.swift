@@ -6,9 +6,9 @@ import JpegResizerApp
 ///
 /// 各タブの中身:
 ///   - 取り込み・整理: RawTrashTab（統合アプリ内・RawTrashCore を直接使用）
+///   - ジオタグ: GeoTaggerTab（統合アプリ内・GeoTaggerCore を直接使用）
 ///   - HEIC 変換: GainForgeTab（GainForgeApp モジュール）
 ///   - リサイズ書き出し: JpegResizerTab（JpegResizerApp モジュール）
-///   - ジオタグ: GeoTaggerTab（統合アプリ内・GeoTaggerCore を直接使用）
 ///
 /// GainForge タブは比較ビューワ（別ウィンドウ）の共有状態 `ViewerModel` をルートから
 /// environmentObject で受け取り、そのままタブへ引き渡す。
@@ -37,6 +37,10 @@ struct ContentView: View {
                 .tabItem { Label("取り込み・整理", systemImage: "tray.and.arrow.down") }
                 .tag(Tab.organize)
 
+            GeoTaggerTab()
+                .tabItem { Label("ジオタグ", systemImage: "mappin.and.ellipse") }
+                .tag(Tab.geoTagger)
+
             GainForgeTab()
                 .environmentObject(gainForgeViewer)
                 .tabItem { Label("HEIC 変換", systemImage: "camera.filters") }
@@ -45,10 +49,6 @@ struct ContentView: View {
             JpegResizerTab()
                 .tabItem { Label("リサイズ書き出し", systemImage: "arrow.down.right.and.arrow.up.left") }
                 .tag(Tab.resize)
-
-            GeoTaggerTab()
-                .tabItem { Label("ジオタグ", systemImage: "mappin.and.ellipse") }
-                .tag(Tab.geoTagger)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         // 差し色: 選択中タブの署名色を environment の tint として流す。別モジュールの
