@@ -76,7 +76,7 @@
   <p class="tag">撮影後の写真ワークフローを一本化する macOS 統合デスクトップアプリ。
     仕分け・HDR 変換・リサイズ・ジオタグを、タブで切り替える 1 つのアプリに集約。</p>
   <div class="cta">
-    <a class="btn btn-primary" href="https://github.com/Junpeiwada/JPPhotoTools/releases/latest">ダウンロード（最新版）</a>
+    <a id="dl" class="btn btn-primary" href="https://github.com/Junpeiwada/JPPhotoTools/releases/latest">ダウンロード<span id="ver"></span></a>
     <a class="btn btn-ghost" href="https://github.com/Junpeiwada/JPPhotoTools">GitHub</a>
   </div>
   <p class="req">動作環境: <b>macOS 15 以降（Apple Silicon）</b> ／ ジオタグ書き込みには <b>exiftool</b> が必要</p>
@@ -124,6 +124,22 @@
   <a href="https://github.com/Junpeiwada/JPPhotoTools/blob/main/LICENSE">MIT License</a> &nbsp;·&nbsp;
   © 2026 junpeiwada
 </footer>
+
+<script>
+  // ダウンロードボタンを最新リリースの .zip 直リンクに差し替える。
+  // 初期 href は releases/latest（HTML）にしてあり、API 取得に失敗してもそのまま使える。
+  // 成功時は zip の browser_download_url を直に指すので、リリースページを経由せず即ダウンロードになる。
+  var REPO = 'Junpeiwada/JPPhotoTools';
+  fetch('https://api.github.com/repos/' + REPO + '/releases/latest')
+    .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+    .then(function (d) {
+      var zip = (d.assets || []).find(function (a) { return /\.zip$/.test(a.name); });
+      if (zip) { document.getElementById('dl').href = zip.browser_download_url; }
+      var v = document.getElementById('ver');
+      if (v && d.tag_name) { v.textContent = ' ' + d.tag_name; }
+    })
+    .catch(function () { /* フォールバック: releases/latest のまま */ });
+</script>
 
 </body>
 </html>
