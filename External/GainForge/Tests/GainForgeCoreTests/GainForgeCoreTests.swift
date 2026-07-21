@@ -27,18 +27,20 @@ final class GainForgeCoreTests: XCTestCase {
 
     // MARK: - collectInputImages
 
-    func testCollectInputImagesFindsJpgJpegPngRecursively() throws {
+    func testCollectInputImagesFindsJpgJpegPngWebpRecursively() throws {
         _ = try touch("a.jpg")
         _ = try touch("b.JPEG")
         _ = try touch("c.png")
         _ = try touch("d.gif")   // 非対応拡張子は拾わない
+        _ = try touch("g.webp")
         let sub = tmp.appendingPathComponent("sub")
         try FileManager.default.createDirectory(at: sub, withIntermediateDirectories: true)
         _ = try touch("e.jpeg", in: sub)
         _ = try touch("f.PNG", in: sub)
+        _ = try touch("h.WEBP", in: sub)
 
         let found = GainForge.collectInputImages(tmp).map { $0.lastPathComponent }.sorted()
-        XCTAssertEqual(found, ["a.jpg", "b.JPEG", "c.png", "e.jpeg", "f.PNG"])
+        XCTAssertEqual(found, ["a.jpg", "b.JPEG", "c.png", "e.jpeg", "f.PNG", "g.webp", "h.WEBP"])
     }
 
     func testCollectInputImagesOnSingleFile() throws {

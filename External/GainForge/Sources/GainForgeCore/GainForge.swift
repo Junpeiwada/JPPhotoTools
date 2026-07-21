@@ -565,10 +565,11 @@ public enum GainForge {
     }
 
     /// 入力として受け付ける画像拡張子（小文字）。
-    /// JPEG は生転写 / SDR 化の主対象、PNG はゲインマップ非対応の素 SDR 画像として SDR→HDR 補正で活きる。
-    public static let supportedInputExtensions: Set<String> = ["jpg", "jpeg", "png"]
+    /// JPEG は生転写 / SDR 化の主対象、PNG / WebP はゲインマップ非対応の素 SDR 画像として SDR→HDR 補正で活きる。
+    /// WebP はゲインマップ補助データを持てないため生転写経路には乗らず、常に `sdrMode` の経路を通る。
+    public static let supportedInputExtensions: Set<String> = ["jpg", "jpeg", "png", "webp"]
 
-    /// フォルダを再帰探索し、対応拡張子（`*.jpg` / `*.jpeg` / `*.png`）の URL 一覧を返す。
+    /// フォルダを再帰探索し、対応拡張子（`*.jpg` / `*.jpeg` / `*.png` / `*.webp`）の URL 一覧を返す。
     /// ファイル URL はそのまま 1 件返す。結果はパス順にソートする。
     public static func collectInputImages(_ url: URL) -> [URL] {
         let fm = FileManager.default
