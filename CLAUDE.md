@@ -67,7 +67,9 @@ open App/JPPhotoTools.xcodeproj        # Xcode で JPPhotoTools スキームを 
 cd App && xcodegen generate
 ```
 
-`App/Sources/` 配下にファイルを追加するだけなら（`sources: - path: Sources` でフォルダ参照のため）再生成は基本不要。設定変更時は必ず `project.yml` 側で行う。
+`App/Sources/` 配下にファイルを追加したら **`cd App && xcodegen generate` が必要**。`sources` は個別ファイル列挙方式（`type` 省略のデフォルト）を使っており、pbxproj に各ファイルが列挙される。追加後に再生成しないと `Cannot find 'X' in scope` になる。設定変更時も必ず `project.yml` 側で行う。
+
+**`type: syncedFolder`（Xcode 16 フォルダ参照）は使わないこと。** 再生成不要になる利点はあるが、XcodeGen が生成する pbxproj に `Resources` ビルドフェーズが作られず、`Sources/Assets.xcassets` がコンパイルされない（`.car` がバンドルに入らず、`No color named '...' found in asset catalog` 警告と共に色・文字・ボタンが表示破綻する）。`type: folder` も同様にソース扱いされず不可。
 
 ### テスト（各パッケージ / SwiftPM）
 

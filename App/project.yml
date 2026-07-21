@@ -33,6 +33,10 @@ targets:
     type: application
     platform: macOS
     sources:
+      # 個別ファイル列挙方式（デフォルト）。Assets.xcassets を確実にリソース
+      # コンパイル（.car 化）させるためこの方式を使う。syncedFolder にすると
+      # Resources ビルドフェーズが生成されず asset catalog がバンドルに入らない。
+      # Sources 配下にファイルを追加したら `cd App && xcodegen generate` が必要。
       - path: Sources
     dependencies:
       - package: GainForgeApp
