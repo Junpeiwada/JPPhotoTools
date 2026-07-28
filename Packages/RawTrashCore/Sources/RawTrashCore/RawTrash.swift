@@ -12,8 +12,8 @@ import Foundation
 /// RAW でも JPG でもないファイル（`.DS_Store` や他拡張子）は移動せずそのまま残す。
 public enum RawTrash {
 
-    /// 対応する RAW 拡張子（Sony/Olympus/Canon）。比較は小文字化して行うため大小は問わない。
-    public static let rawExtensions: Set<String> = ["arw", "orf", "cr3", "cr2"]
+    /// 対応する RAW 拡張子（Sony / Olympus / Canon、および汎用の DNG）。比較は小文字化して行うため大小は問わない。
+    public static let rawExtensions: Set<String> = ["arw", "orf", "cr3", "cr2", "dng"]
 
     /// JPG とみなす拡張子。比較は小文字化して行う。
     public static let jpgExtensions: Set<String> = ["jpg", "jpeg"]

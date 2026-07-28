@@ -40,6 +40,33 @@ final class RawTrashTests: XCTestCase {
         XCTAssertTrue(exists("note.txt"), "その他ファイルは移動されない")
     }
 
+    /// DNG も RAW として扱う（ペアあり → RAW/、孤立 → Del/、大小は問わない）。
+    func testDngIsTreatedAsRaw() throws {
+        try touch("P1.dng")     // ペアあり
+        try touch("P1.jpg")
+        try touch("P2.DNG")     // 孤立 RAW（大文字）
+
+        let result = try RawTrash.sort(folderPath: tmp)
+
+        XCTAssertEqual(result, .init(total: 3, deleted: 1, raw: 1, jpg: 1))
+        XCTAssertTrue(exists("RAW/P1.dng"))
+        XCTAssertTrue(exists("JPG/P1.jpg"))
+        XCTAssertTrue(exists("Del/P2.DNG"))
+    }
+
+    /// DNG は他形式からの変換で生まれるため、同名 stem の別 RAW と共存しうる。
+    /// 衝突判定は拡張子込みのフルファイル名なので、両方そのままの名前で退避される。
+    func testDngCoexistsWithSameStemRaw() throws {
+        try touch("DSC0001.dng")
+        try touch("DSC0001.arw")  // JPG なし → どちらも孤立
+
+        let result = try RawTrash.sort(folderPath: tmp)
+
+        XCTAssertEqual(result, .init(total: 2, deleted: 2, raw: 0, jpg: 0))
+        XCTAssertTrue(exists("Del/DSC0001.dng"))
+        XCTAssertTrue(exists("Del/DSC0001.arw"), "拡張子が違うため連番退避されない")
+    }
+
     /// ペア判定は大小無視の stem 一致（DSC.ARW と dsc.jpg はペア）。
     func testCaseInsensitivePairing() throws {
         try touch("DSC0001.ARW")
